@@ -57,6 +57,7 @@ def ask_property():
 
     # TEMPORARY: Print the API key to the logs (remove this after debugging)
     print("DEBUG: OpenRouter API Key is:", Config.OPENROUTER_API_KEY)
+    print("DEBUG HEADERS:", headers)
 
     # Initialize session chat history if not present
     if 'chat_history' not in session:
