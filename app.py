@@ -3,8 +3,11 @@ import json
 import os
 import requests
 from config import Config
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret-key")  # Add this line
 print("Server started")
 
 # Load listings once at startup
