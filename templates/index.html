@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Real Estate Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2em auto; }
+        #chat-interface { border: 1px solid #ccc; padding: 1em; border-radius: 6px; background: #f9f9f9; }
+        #messages { max-height: 300px; overflow-y: auto; margin-bottom: 1em; }
+        .message { margin-bottom: 0.7em; padding: 0.5em 0.7em; border-radius: 6px; }
+        .user { background-color: #d1e7ff; text-align: right; }
+        .bot { background-color: #e0e0e0; text-align: left; }
+        form { display: flex; gap: 0.5em; }
+        input[type="text"] { flex-grow: 1; padding: 0.5em; border-radius: 4px; border: 1px solid #ccc; }
+        button { padding: 0.5em 1em; border-radius: 4px; border: none; background: #007bff; color: white; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #booking-response { margin-top: 1em; color: green; }
+    </style>
+</head>
+<body>
+    <h1>Real Estate Chatbot</h1>
+    <div id="chat-interface">
+        <div id="messages"></div>
+
+        <form id="ask-property-form">
+            <input type="text" id="question" name="question" placeholder="Ask about a property or rental..." autocomplete="off" required />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <h2>Book an Inspection</h2>
+    <form id="book-inspection-form">
+        <input type="text" name="name" placeholder="Your Name" required />
+        <input type="email" name="email" placeholder="Your Email" required />
+        <input type="text" name="phone" placeholder="Your Phone" required />
+        <input type="text" name="preferred_time" placeholder="Preferred Time" required />
+        <button type="submit">Book Inspection</button>
+    </form>
+    <div id="booking-response"></div>
+
+    <script>
+        const messagesDiv = document.getElementById("messages");
+        const askForm = document.getElementById("ask-property-form");
+        const bookingForm = document.getElementById("book-inspection-form");
+        const bookingResponse = document.getElementById("booking-response");
+
+        function appendMessage(text, sender) {
+            const div = document.createElement("div");
+            div.className = "message " + sender;
+            div.textContent = text;
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        askForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const questionInput = askForm.elements["question"];
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            appendMessage(question, "user");
+            questionInput.value = "";
+            bookingResponse.textContent = "";
+
+            try {
+                const res = await fetch("/ask_property", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question }),
+                });
+                const data = await res.json();
+                appendMessage(data.answer, "bot");
+            } catch (error) {
+                appendMessage("Error contacting chatbot.", "bot");
+            }
+        });
+
+        bookingForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = {
+                name: bookingForm.elements["name"].value.trim(),
+                email: bookingForm.elements["email"].value.trim(),
+                phone: bookingForm.elements["phone"].value.trim(),
+                preferred_time: bookingForm.elements["preferred_time"].value.trim(),
+            };
+
+            try {
+                const res = await fetch("/book_inspection", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                });
+                const data = await res.json();
+                bookingResponse.textContent = data.message;
+                bookingForm.reset();
+            } catch (error) {
+                bookingResponse.textContent = "Error booking inspection.";
+            }
+        });
+    </script>
+</body>
+</html>

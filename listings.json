@@ -1,0 +1,82 @@
+[
+  {
+    "address": "12 Green St",
+    "suburb": "Carlton",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "type": "Apartment",
+    "price": "$450 per week"
+  },
+  {
+    "address": "88 Blue Rd",
+    "suburb": "Fitzroy",
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "type": "House",
+    "price": "$850 per week"
+  },
+  {
+    "address": "7 Oak Ave",
+    "suburb": "Brunswick",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "type": "Apartment",
+    "price": "$350 per week"
+  },
+  {
+    "address": "23 Maple St",
+    "suburb": "Carlton",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "type": "Apartment",
+    "price": "$470 per week"
+  },
+  {
+    "address": "42 Pine Ln",
+    "suburb": "Richmond",
+    "bedrooms": 4,
+    "bathrooms": 2,
+    "type": "House",
+    "price": "$1200 per week"
+  },
+  {
+    "address": "18 Elm St",
+    "suburb": "Fitzroy",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "type": "Apartment",
+    "price": "$480 per week"
+  },
+  {
+    "address": "90 Cedar Rd",
+    "suburb": "Brunswick",
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "type": "Townhouse",
+    "price": "$800 per week"
+  },
+  {
+    "address": "55 Willow St",
+    "suburb": "Carlton",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "type": "Studio",
+    "price": "$300 per week"
+  },
+  {
+    "address": "33 Birch St",
+    "suburb": "Richmond",
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "type": "Apartment",
+    "price": "$700 per week"
+  },
+  {
+    "address": "77 Spruce Rd",
+    "suburb": "Fitzroy",
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "type": "House",
+    "price": "$900 per week"
+  }
+]
