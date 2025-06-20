@@ -5,7 +5,8 @@ import requests
 from config import Config
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # For session support
+app = Flask(__name__)
+print("Server started")
 
 # Load listings once at startup
 with open(os.path.join(os.path.dirname(__file__), 'listings.json'), 'r') as f:
