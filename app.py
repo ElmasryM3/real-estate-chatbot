@@ -84,7 +84,7 @@ def ask_property():
     headers = {
         "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
-        "Referer": "https://real-estate-chatbot-kp5e.onrender.com/",  # <- use your actual Render URL here
+        "Referer": "https://real-estate-chatbot-kp5e.onrender.com",  # <- use your actual Render URL here
     }
 
     body = {
@@ -95,9 +95,15 @@ def ask_property():
 
     try:
         response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
+
+        # 🔍 Debug print
+        print("Status Code:", response.status_code)
+        print("Response Text:", response.text)
+
         response.raise_for_status()
         data = response.json()
         answer = data["choices"][0]["message"]["content"].strip()
+
     except Exception as e:
         answer = f"Error: {str(e)}"
 
