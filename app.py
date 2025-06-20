@@ -84,7 +84,7 @@ def ask_property():
     headers = {
         "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
-        "Referer": "https://yourdomain.com",
+        "Referer": "https://real-estate-chatbot-kp5e.onrender.com/",  # <- use your actual Render URL here
     }
 
     body = {
