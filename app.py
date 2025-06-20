@@ -84,7 +84,7 @@ def ask_property():
     headers = {
         "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
-        "Referer": "https://real-estate-chatbot-kp5e.onrender.com",  # <- use your actual Render URL here
+        "Referer": "https://real-estate-chatbot-kp5e.onrender.com"
     }
 
     body = {
@@ -104,15 +104,28 @@ def ask_property():
         data = response.json()
         answer = data["choices"][0]["message"]["content"].strip()
 
+
     except Exception as e:
         answer = f"Error: {str(e)}"
-
-    # Update session chat history
-    session['chat_history'].append({"role": "user", "content": user_question + props_info})
-    session['chat_history'].append({"role": "assistant", "content": answer})
-    session.modified = True  # Mark session changed
-
-    return jsonify({"answer": answer})
+        import traceback
+        print("⚠️ OpenRouter request failed:")
+        print("Exception:", e)
+        traceback.print_exc()
+        print("\n🔐 Headers Sent:")
+        print(headers)
+        print("\n📦 Payload Sent:")
+        print(json.dumps(body, indent=2))
+        try:
+            print("\n📬 Response from OpenRouter:")
+            print("Status code:", response.status_code)
+            print("Response body:", response.text)
+        except:
+            print("❌ No response object available")
+        # Update chat history
+        session['chat_history'].append({"role": "user", "content": user_question + props_info})
+        session['chat_history'].append({"role": "assistant", "content": answer})
+        session.modified = True
+        return jsonify({"answer": answer})
 
 
 @app.route("/book_inspection", methods=["POST"])
