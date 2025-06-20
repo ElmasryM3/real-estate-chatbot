@@ -100,7 +100,10 @@ def ask_property():
     }
 
     try:
+        print(f"DEBUG: Using API Key: {Config.OPENROUTER_API_KEY}")  # Add this line
+
         response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
+        response.raise_for_status()
 
         # 🔍 Debug print
         print("Status Code:", response.status_code)
