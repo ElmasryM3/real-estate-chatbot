@@ -5,7 +5,6 @@ import requests
 from config import Config
 
 app = Flask(__name__)
-app = Flask(__name__)
 print("Server started")
 
 # Load listings once at startup
