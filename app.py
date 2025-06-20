@@ -50,7 +50,10 @@ def index():
 
 @app.route("/ask_property", methods=["POST"])
 def ask_property():
-    user_question = request.json.get("question", "").strip()
+    user_question = request.json.get("question")
+
+    # TEMPORARY: Print the API key to the logs (remove this after debugging)
+    print("DEBUG: OpenRouter API Key is:", Config.OPENROUTER_API_KEY)
 
     # Initialize session chat history if not present
     if 'chat_history' not in session:
