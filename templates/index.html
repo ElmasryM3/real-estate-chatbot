@@ -85,29 +85,43 @@
             }
         });
 
-        bookingForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const formData = {
-                name: bookingForm.elements["name"].value.trim(),
-                email: bookingForm.elements["email"].value.trim(),
-                phone: bookingForm.elements["phone"].value.trim(),
-                property: bookingForm.elements["property"].value.trim(),
-                preferred_time: bookingForm.elements["preferred_time"].value,
-            };
+        const bookingForm = document.getElementById("book-inspection-form");
+const bookingResponse = document.getElementById("booking-response");
 
-            try {
-                const res = await fetch("/book_property", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData),
-                });
-                const data = await res.json();
-                bookingResponse.textContent = data.message || "Successfully booked inspection.";
-                bookingForm.reset();
-            } catch (error) {
-                bookingResponse.textContent = "Error booking inspection.";
-            }
+bookingForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = {
+        name: bookingForm.elements["name"].value.trim(),
+        email: bookingForm.elements["email"].value.trim(),
+        phone: bookingForm.elements["phone"].value.trim(),
+        property: bookingForm.elements["property"]?.value.trim() || "N/A",
+        preferred_time: bookingForm.elements["preferred_time"].value.trim(),
+    };
+
+    try {
+        const res = await fetch("/book_property", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
         });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            bookingResponse.textContent = data.message || "✅ Your inspection has been booked!";
+            bookingResponse.style.color = "green";
+            bookingForm.reset();
+        } else {
+            throw new Error(data.message || "Failed to book inspection.");
+        }
+    } catch (error) {
+        console.error("Booking error:", error);
+        bookingResponse.textContent = "❌ Error booking inspection. Please try again.";
+        bookingResponse.style.color = "red";
+    }
+});
+
     </script>
 </body>
 </html>

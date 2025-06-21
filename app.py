@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session
+from flask_mail import Mail, Message
 import json
 import os
 import requests
@@ -7,6 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+app.config.from_object(Config)
+mail = Mail(app)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret-key")  # Add this line
 print("Server started")
 
@@ -140,3 +143,30 @@ def book_inspection():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
+@app.route("/book_inspection", methods=["POST"])
+def book_inspection():
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+    phone = data.get("phone")
+    preferred_time = data.get("preferred_time")
+
+    try:
+        msg = Message(
+            subject="🔔 New Inspection Booking",
+            recipients=["your_email@gmail.com"],  # your receiving address
+            body=f"""
+New Booking Request:
+
+Name: {name}
+Email: {email}
+Phone: {phone}
+Preferred Time: {preferred_time}
+"""
+        )
+        mail.send(msg)
+        return jsonify({"success": True, "message": "Booking sent successfully!"})
+    except Exception as e:
+        print("Error sending email:", e)
+        return jsonify({"success": False, "message": "Failed to send booking."}), 500
