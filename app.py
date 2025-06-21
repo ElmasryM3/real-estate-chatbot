@@ -101,42 +101,50 @@ def ask_property():
     }
 
     try:
+        headers = {
+            "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+            "Referer": "https://your-live-app-url.com"  # Optional, can be your Render URL
+        }
+
+        body = {
+            "model": "openai/gpt-3.5-turbo",
+            "messages": session.get("chat_history", [])
+        }
+
         print(f"DEBUG: Using API Key: {Config.OPENROUTER_API_KEY}")
+        print("📦 Payload Sent:", json.dumps(body, indent=2))
+        print("🔐 Headers Sent:", headers)
 
         response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
         response.raise_for_status()
 
-        # 🔍 Debug print
-        print("Status Code:", response.status_code)
-        print("Response Text:", response.text)
+        print("✅ Status Code:", response.status_code)
+        print("📝 Response Text:", response.text)
 
-        response.raise_for_status()
         data = response.json()
         answer = data["choices"][0]["message"]["content"].strip()
-
 
     except Exception as e:
         answer = f"Error: {str(e)}"
         import traceback
         print("⚠️ OpenRouter request failed:")
-        print("Exception:", e)
         traceback.print_exc()
-        print("\n🔐 Headers Sent:")
-        print(headers)
-        print("\n📦 Payload Sent:")
-        print(json.dumps(body, indent=2))
+
+        # Safe debug in case response isn't defined
         try:
-            print("\n📬 Response from OpenRouter:")
+            print("📬 Response from OpenRouter:")
             print("Status code:", response.status_code)
             print("Response body:", response.text)
         except:
             print("❌ No response object available")
-        # Update chat history
-        session['chat_history'].append({"role": "user", "content": user_question + props_info})
-        session['chat_history'].append({"role": "assistant", "content": answer})
-        session.modified = True
-        return jsonify({"answer": answer})
 
+    # Update chat history outside the try-except
+    session['chat_history'].append({"role": "user", "content": user_question + props_info})
+    session['chat_history'].append({"role": "assistant", "content": answer})
+    session.modified = True
+
+    return jsonify({"answer": answer})
 
 @app.route("/book_inspection", methods=["POST"])
 def book_inspection():
