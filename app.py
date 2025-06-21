@@ -55,22 +55,17 @@ def index():
 def ask_property():
     user_question = request.json.get("question")
 
-    # TEMPORARY: Print the API key to the logs (remove this after debugging)
-    print("DEBUG: OpenRouter API Key is:", Config.OPENROUTER_API_KEY)
-    print("DEBUG HEADERS:", headers)
-
     # Initialize session chat history if not present
     if 'chat_history' not in session:
         session['chat_history'] = []
 
-    # Load prompt template
+    # Load system prompt
     with open("prompts/property_faq.txt", "r") as file:
         prompt_template = file.read()
 
-    # Find matching listings from user message
+    # Find matching properties
     matched_props = find_matching_listings(user_question, listings)
 
-    # Format matched properties info as a string to append to prompt
     if matched_props:
         props_info = "\nHere are some properties that might interest you:\n"
         for p in matched_props:
@@ -78,68 +73,46 @@ def ask_property():
     else:
         props_info = "\nNo matching properties found."
 
-    # Build conversation messages for GPT
+    # Build conversation messages
     messages = [{"role": "system", "content": prompt_template}]
-
-    # Add previous chat history from session (up to last 6 messages for context)
-    history = session['chat_history'][-6:]
-    messages.extend(history)
-
-    # Add user current question
+    messages.extend(session['chat_history'][-6:])  # last 6 messages
     messages.append({"role": "user", "content": user_question + props_info})
 
+    # Define headers & body
     headers = {
         "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
-        "Referer": "https://real-estate-chatbot-kp5e.onrender.com"
+        "Referer": "https://real-estate-chatbot-kp5e.onrender.com"  # your render link
     }
 
     body = {
         "model": "openai/gpt-3.5-turbo",
         "messages": messages,
-        "temperature": 0.7,
+        "temperature": 0.7
     }
 
     try:
-        headers = {
-            "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
-            "Content-Type": "application/json",
-            "Referer": "https://your-live-app-url.com"  # Optional, can be your Render URL
-        }
-
-        body = {
-            "model": "openai/gpt-3.5-turbo",
-            "messages": session.get("chat_history", [])
-        }
-
-        print(f"DEBUG: Using API Key: {Config.OPENROUTER_API_KEY}")
-        print("📦 Payload Sent:", json.dumps(body, indent=2))
-        print("🔐 Headers Sent:", headers)
+        # Debugging logs (safe to remove in production)
+        print("🔐 DEBUG API Key:", Config.OPENROUTER_API_KEY)
+        print("📦 DEBUG Payload:", json.dumps(body, indent=2))
+        print("🧾 DEBUG Headers:", headers)
 
         response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
         response.raise_for_status()
 
-        print("✅ Status Code:", response.status_code)
-        print("📝 Response Text:", response.text)
+        print("✅ DEBUG Response Code:", response.status_code)
+        print("📝 DEBUG Response Text:", response.text)
 
         data = response.json()
         answer = data["choices"][0]["message"]["content"].strip()
 
     except Exception as e:
-        answer = f"Error: {str(e)}"
         import traceback
-        print("⚠️ OpenRouter request failed:")
+        print("❌ Error contacting OpenRouter:", str(e))
         traceback.print_exc()
+        answer = f"Error: {str(e)}"
 
-        # Safe debug in case response isn't defined
-        try:
-            print("📬 Response from OpenRouter:")
-            print("Status code:", response.status_code)
-            print("Response body:", response.text)
-        except:
-            print("❌ No response object available")
-
-    # Update chat history outside the try-except
+    # Update chat history
     session['chat_history'].append({"role": "user", "content": user_question + props_info})
     session['chat_history'].append({"role": "assistant", "content": answer})
     session.modified = True
