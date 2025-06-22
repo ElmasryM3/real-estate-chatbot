@@ -119,6 +119,9 @@ Preferred Time: {preferred_time}
     except Exception as e:
         print("❌ Error sending email:", e)
         return jsonify({"success": False, "message": "Failed to send booking email."}), 500
+@app.route("/book_property", methods=["POST"])
+def book_property():
+    return book_inspection()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
