@@ -72,7 +72,7 @@ def ask_property():
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Hello!"},
     ],
-        "temperature": 0.7
+        "temperature": 0.7,
         "max_tokens": 150,
     }
 
