@@ -83,7 +83,7 @@ def ask_property():
 
         # Correct URL with 'api.' subdomain
         response = requests.post(
-            "https://api.openrouter.ai/v1/chat/completions",
+            "https://openrouter.ai/api/v1/chat/completions",
             headers=headers,
             json=body,
             timeout=30
