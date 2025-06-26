@@ -57,12 +57,8 @@ def ask_property():
     for p in matched_props:
         props_info += f"- {p['address']}, {p['suburb']}: {p['bedrooms']} bed / {p['bathrooms']} bath / {p['type']} - Price: {p['price']}\n"
 
-    # Prepare messages ensuring all entries are dicts with role and content strings
     messages = [{"role": "system", "content": prompt_template}]
-    # Validate previous chat history entries before extending
-    for entry in session['chat_history'][-6:]:
-        if isinstance(entry, dict) and 'role' in entry and 'content' in entry:
-            messages.append(entry)
+    messages.extend(session['chat_history'][-6:])
     messages.append({"role": "user", "content": user_question + props_info})
 
     headers = {
@@ -71,22 +67,30 @@ def ask_property():
     }
 
     body = {
-        "model": "openai/gpt-3.5-turbo",
-        "messages": messages,
+        "model": "openrouter/openai/gpt-3.5-turbo",
+        "messages": [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Hello!"},
+    ],
         "temperature": 0.7
+        "max_tokens": 150,
     }
 
     try:
-        print("🔐 API Key:", Config.OPENROUTER_API_KEY)
-
         print("🔍 FINAL REQUEST DEBUG:")
         print("Headers:", headers)
         print("Body:", json.dumps(body, indent=2))
 
-        response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
+        # Correct URL with 'api.' subdomain
+        response = requests.post(
+            "https://api.openrouter.ai/v1/chat/completions",
+            headers=headers,
+            json=body,
+            timeout=30
+        )
 
         print("Response status code:", response.status_code)
-        print("❌ Response from OpenRouter:", response.text)
+        print("Response text:", response.text)
 
         response.raise_for_status()
 
