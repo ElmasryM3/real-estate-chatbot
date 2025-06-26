@@ -57,18 +57,22 @@ def ask_property():
     for p in matched_props:
         props_info += f"- {p['address']}, {p['suburb']}: {p['bedrooms']} bed / {p['bathrooms']} bath / {p['type']} - Price: {p['price']}\n"
 
+    # Prepare messages ensuring all entries are dicts with role and content strings
     messages = [{"role": "system", "content": prompt_template}]
-    messages.extend(session['chat_history'][-6:])
+    # Validate previous chat history entries before extending
+    for entry in session['chat_history'][-6:]:
+        if isinstance(entry, dict) and 'role' in entry and 'content' in entry:
+            messages.append(entry)
     messages.append({"role": "user", "content": user_question + props_info})
 
     headers = {
         "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "Referer": "https://real-estate-chatbot-kp5e.onrender.com"
+        "Content-Type": "application/json"
+        # Removed 'Referer' header to avoid potential API rejection
     }
 
     body = {
-        "model": "openrouter/openai/gpt-3.5-turbo",
+        "model": "openai/gpt-3.5-turbo",  # Correct model string as per OpenRouter docs
         "messages": messages,
         "temperature": 0.7
     }
@@ -76,7 +80,6 @@ def ask_property():
     try:
         print("🔐 API Key:", Config.OPENROUTER_API_KEY)
 
-        # ✅ Add this just before sending the request
         print("🔍 FINAL REQUEST DEBUG:")
         print("Headers:", headers)
         print("Body:", json.dumps(body, indent=2))
@@ -84,8 +87,6 @@ def ask_property():
         response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
 
         print("Response status code:", response.status_code)
-
-        # ✅ Add this after the request
         print("❌ Response from OpenRouter:", response.text)
 
         response.raise_for_status()
@@ -117,7 +118,7 @@ def book_inspection():
     try:
         msg = Message(
             subject="🔔 New Property Inspection Booking",
-            recipients=["botivaai@gmail.com"],  # 🔁 Replace with your actual email
+            recipients=["botivaai@gmail.com"],  # Replace with your actual email
             body=f"""
 New Inspection Booking:
 
