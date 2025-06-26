@@ -75,12 +75,24 @@ def ask_property():
 
     try:
         print("🔐 API Key:", Config.OPENROUTER_API_KEY)
+
+        # ✅ Add this just before sending the request
+        print("🔍 FINAL REQUEST DEBUG:")
+        print("Headers:", headers)
+        print("Body:", json.dumps(body, indent=2))
+
         response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
+
         print("Response status code:", response.status_code)
-        print("Response text:", response.text)  # <-- Added debug info here
+
+        # ✅ Add this after the request
+        print("❌ Response from OpenRouter:", response.text)
+
         response.raise_for_status()
+
         data = response.json()
         answer = data["choices"][0]["message"]["content"].strip()
+
     except Exception as e:
         import traceback
         print("❌ Error contacting OpenRouter:", str(e))
