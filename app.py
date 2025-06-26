@@ -76,6 +76,8 @@ def ask_property():
     try:
         print("🔐 API Key:", Config.OPENROUTER_API_KEY)
         response = requests.post(Config.OPENROUTER_URL, headers=headers, json=body)
+        print("Response status code:", response.status_code)
+        print("Response text:", response.text)  # <-- Added debug info here
         response.raise_for_status()
         data = response.json()
         answer = data["choices"][0]["message"]["content"].strip()
@@ -119,6 +121,7 @@ Preferred Time: {preferred_time}
     except Exception as e:
         print("❌ Error sending email:", e)
         return jsonify({"success": False, "message": "Failed to send booking email."}), 500
+
 @app.route("/book_property", methods=["POST"])
 def book_property():
     return book_inspection()
