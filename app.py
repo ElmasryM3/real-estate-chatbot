@@ -68,11 +68,10 @@ def ask_property():
     headers = {
         "Authorization": f"Bearer {Config.OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
-        # Removed 'Referer' header to avoid potential API rejection
     }
 
     body = {
-        "model": "openai/gpt-3.5-turbo",  # Correct model string as per OpenRouter docs
+        "model": "openai/gpt-3.5-turbo",
         "messages": messages,
         "temperature": 0.7
     }
