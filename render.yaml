@@ -6,4 +6,4 @@ services:
     startCommand: "python app.py"
     envVars:
       - key: OPENROUTER_API_KEY
-        value: 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
+        value: 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
