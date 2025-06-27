@@ -107,13 +107,8 @@
       animation: blink 1.4s infinite;
     }
 
-    .dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
 
     @keyframes blink {
       0%, 80%, 100% { transform: scale(1); opacity: 0.6; }
@@ -139,6 +134,45 @@
       border: none;
       padding: 0 1em;
       cursor: pointer;
+    }
+
+    /* Booking Form Styles */
+    #book-inspection-form {
+      margin: 2em auto;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6em;
+      background-color: #2c2c2c;
+      padding: 1.2em;
+      border-radius: 10px;
+    }
+
+    #book-inspection-form input,
+    #book-inspection-form button {
+      padding: 0.6em;
+      border-radius: 6px;
+      border: none;
+      font-size: 1em;
+    }
+
+    #book-inspection-form input {
+      background: #1e1e1e;
+      color: white;
+    }
+
+    #book-inspection-form button {
+      background-color: #28a745;
+      color: white;
+    }
+
+    #book-inspection-form button:hover {
+      background-color: #218838;
+    }
+
+    #booking-response {
+      font-size: 0.9em;
+      margin-top: 0.5em;
     }
   </style>
 </head>
@@ -169,10 +203,24 @@
     </form>
   </div>
 
+  <!-- Booking Form -->
+  <form id="book-inspection-form">
+    <h3 style="color: white; text-align: center;">Book an Inspection</h3>
+    <input type="text" name="name" placeholder="Your Name" required />
+    <input type="email" name="email" placeholder="Your Email" required />
+    <input type="text" name="phone" placeholder="Your Phone" required />
+    <input type="text" name="property" placeholder="Property Address or ID" required />
+    <input type="datetime-local" name="preferred_time" required />
+    <button type="submit">Book Inspection</button>
+    <p id="booking-response"></p>
+  </form>
+
   <script>
     const messagesDiv = document.getElementById("messages");
     const askForm = document.getElementById("ask-property-form");
     const typingIndicator = document.getElementById("typing-indicator");
+    const bookingForm = document.getElementById("book-inspection-form");
+    const bookingResponse = document.getElementById("booking-response");
 
     function toggleChat() {
       const chatBox = document.getElementById("chat-interface");
@@ -187,6 +235,7 @@
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
+    // Chatbot form submission
     askForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const questionInput = askForm.elements["question"];
@@ -195,7 +244,6 @@
 
       appendMessage(question, "user");
       questionInput.value = "";
-
       typingIndicator.style.display = "flex";
 
       try {
@@ -210,6 +258,36 @@
       } catch (error) {
         typingIndicator.style.display = "none";
         appendMessage("❌ Error contacting chatbot.", "bot");
+      }
+    });
+
+    // Booking form submission
+    bookingForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        name: bookingForm.elements["name"].value.trim(),
+        email: bookingForm.elements["email"].value.trim(),
+        phone: bookingForm.elements["phone"].value.trim(),
+        property: bookingForm.elements["property"].value.trim(),
+        preferred_time: bookingForm.elements["preferred_time"].value.trim(),
+      };
+
+      try {
+        const res = await fetch("/book_property", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await res.json();
+        bookingResponse.textContent = data.message || "✅ Your inspection has been booked!";
+        bookingResponse.style.color = "lightgreen";
+        bookingForm.reset();
+      } catch (error) {
+        console.error("Booking error:", error);
+        bookingResponse.textContent = "❌ Error booking inspection. Please try again.";
+        bookingResponse.style.color = "red";
       }
     });
   </script>
