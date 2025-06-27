@@ -67,8 +67,8 @@ def ask_property():
     }
 
     body = {
-        "model": "openai/gpt-3.5-turbo",
-        "messages": messages,
+        "model": "mistralai/mistral-small-3.2-24b-instruct",
+        "messages": messages,  # your current conversation messages
         "temperature": 0.7
     }
 
