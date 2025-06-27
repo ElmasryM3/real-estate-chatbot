@@ -67,13 +67,9 @@ def ask_property():
     }
 
     body = {
-        "model": "openrouter/openai/gpt-3.5-turbo",
-        "messages": [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Hello!"},
-    ],
-        "temperature": 0.7,
-        "max_tokens": 150,
+        "model": "openai/gpt-3.5-turbo",
+        "messages": messages,
+        "temperature": 0.7
     }
 
     try:
@@ -81,9 +77,8 @@ def ask_property():
         print("Headers:", headers)
         print("Body:", json.dumps(body, indent=2))
 
-        # Correct URL with 'api.' subdomain
         response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
+            Config.OPENROUTER_URL,
             headers=headers,
             json=body,
             timeout=30
