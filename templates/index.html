@@ -136,11 +136,11 @@
       cursor: pointer;
     }
 
-    /* Booking Form Styles */
+    /* Booking Form Styles inside chat */
     #book-inspection-form {
-      margin: 2em auto;
-      max-width: 400px;
-      display: flex;
+      margin: 1em;
+      max-width: 100%;
+      display: none; /* Hidden initially */
       flex-direction: column;
       gap: 0.6em;
       background-color: #2c2c2c;
@@ -170,10 +170,17 @@
       background-color: #218838;
     }
 
-    #booking-response {
-      font-size: 0.9em;
-      margin-top: 0.5em;
+    #show-booking-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 0.5em 1em;
+      margin: 0.5em;
+      border-radius: 8px;
+      cursor: pointer;
+      align-self: center;
     }
+
   </style>
 </head>
 <body>
@@ -181,15 +188,31 @@
 
   <div id="chat-interface">
     <div id="chat-header">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo" />
       <span>Chat with us</span>
     </div>
     <div id="messages"></div>
+
+    <!-- Booking Form inside chat, hidden initially -->
+    <form id="book-inspection-form">
+      <h3 style="color: white; text-align: center;">Book an Inspection</h3>
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <input type="text" name="phone" placeholder="Your Phone" required />
+      <input type="text" name="property" placeholder="Property Address or ID" required />
+      <input type="datetime-local" name="preferred_time" required />
+      <button type="submit">Book Inspection</button>
+    </form>
+
+    <!-- Button to toggle booking form -->
+    <button id="show-booking-btn">Book an Inspection</button>
+
     <div id="typing-indicator">
       <div class="dot"></div>
       <div class="dot"></div>
       <div class="dot"></div>
     </div>
+
     <form id="ask-property-form">
       <input
         type="text"
@@ -203,24 +226,12 @@
     </form>
   </div>
 
-  <!-- Booking Form -->
-  <form id="book-inspection-form">
-    <h3 style="color: white; text-align: center;">Book an Inspection</h3>
-    <input type="text" name="name" placeholder="Your Name" required />
-    <input type="email" name="email" placeholder="Your Email" required />
-    <input type="text" name="phone" placeholder="Your Phone" required />
-    <input type="text" name="property" placeholder="Property Address or ID" required />
-    <input type="datetime-local" name="preferred_time" required />
-    <button type="submit">Book Inspection</button>
-    <p id="booking-response"></p>
-  </form>
-
   <script>
     const messagesDiv = document.getElementById("messages");
     const askForm = document.getElementById("ask-property-form");
     const typingIndicator = document.getElementById("typing-indicator");
     const bookingForm = document.getElementById("book-inspection-form");
-    const bookingResponse = document.getElementById("booking-response");
+    const showBookingBtn = document.getElementById("show-booking-btn");
 
     function toggleChat() {
       const chatBox = document.getElementById("chat-interface");
@@ -234,6 +245,19 @@
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
+
+    // Toggle between chat form and booking form inside chat bubble
+    showBookingBtn.addEventListener("click", () => {
+      if (bookingForm.style.display === "none" || bookingForm.style.display === "") {
+        bookingForm.style.display = "flex";  // Show booking form
+        askForm.style.display = "none";       // Hide chat question form
+        showBookingBtn.textContent = "Back to Chat";
+      } else {
+        bookingForm.style.display = "none";   // Hide booking form
+        askForm.style.display = "flex";       // Show chat question form
+        showBookingBtn.textContent = "Book an Inspection";
+      }
+    });
 
     // Chatbot form submission
     askForm.addEventListener("submit", async (e) => {
@@ -281,13 +305,18 @@
         });
 
         const data = await res.json();
-        bookingResponse.textContent = data.message || "✅ Your inspection has been booked!";
-        bookingResponse.style.color = "lightgreen";
+
+        // Show booking confirmation as a bot message in chat
+        appendMessage(data.message || "✅ Your inspection has been booked!", "bot");
+
         bookingForm.reset();
+        bookingForm.style.display = "none"; // Hide booking form after submit
+        askForm.style.display = "flex";     // Show chat question form again
+        showBookingBtn.textContent = "Book an Inspection";
+
       } catch (error) {
         console.error("Booking error:", error);
-        bookingResponse.textContent = "❌ Error booking inspection. Please try again.";
-        bookingResponse.style.color = "red";
+        appendMessage("❌ Error booking inspection. Please try again.", "bot");
       }
     });
   </script>
